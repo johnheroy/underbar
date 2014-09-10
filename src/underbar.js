@@ -494,6 +494,43 @@ var _ = {};
   //
   // See the Underbar readme for details.
   _.throttle = function(func, wait) {
+    var throttled = false;
+    var queuedRequest = false;
+    var latestValue = null;
+    var msUntilReady = 0;
+
+    setInterval(function(){
+      if (msUntilReady > 0){
+        msUntilReady -= 1;
+      }
+    }, 1);
+
+    var startCountdown = function(){
+      throttled = true;
+      setTimeout(function(){
+        if (!queuedRequest){
+          throttled = false;  
+        }
+      }, wait);
+      msUntilReady = wait;
+    };
+
+    return function(){
+      if (!throttled){
+        latestValue = func.apply(this, arguments);
+        startCountdown();
+      } else if (!queuedRequest) {
+        queuedRequest = true;
+        setTimeout(function(){
+          queuedRequest = false;
+          latestValue = func.apply(this, arguments);
+          startCountdown();
+        }, msUntilReady);  
+      } else {
+        // do nothing, one func call already waiting to exec
+      }
+      return latestValue;
+    };
   };
 
 }).call(this);
