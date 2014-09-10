@@ -393,24 +393,32 @@ var _ = {};
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    // try implementing in 4 steps with _.pluck()
     var results = [];
-    var maxLength = arguments[0].length;
-    for(var i = 1; i < arguments.length; i++){
-      if(arguments[i].length > maxLength){
-        maxLength = arguments[i].length;
-      }
-    }
-
-    for(var i = 0; i < arguments.length; i++){
-      for(var j = 0; j < maxLength; j++){
-        if(results[j] === undefined){
-          results[j] = [];
-        }
-        results[j].push(arguments[i][j]);
-      }
-    }
-
+    for (var i = 0; i < arguments[0].length; i++){ results.push(_.pluck(arguments, i)); }
     return results;
+
+    /* OLD SOLUTION
+     *
+      var results = [];
+      var maxLength = arguments[0].length;
+      for(var i = 1; i < arguments.length; i++){
+        if(arguments[i].length > maxLength){
+          maxLength = arguments[i].length;
+        }
+      }
+
+      for(var i = 0; i < arguments.length; i++){
+        for(var j = 0; j < maxLength; j++){
+          if(results[j] === undefined){
+            results[j] = [];
+          }
+          results[j].push(arguments[i][j]);
+        }
+      }
+
+      return results;
+    */
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
