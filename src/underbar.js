@@ -131,6 +131,8 @@ var _ = {};
       }
       return result;  
     }
+
+    // you can also use _.each and just push to a results array
   };
 
   /*
@@ -360,6 +362,29 @@ var _ = {};
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var results = [];
+    _.each(collection, function(value){
+      var elementAdded = false;
+      for (var i = 0; i < results.length; i++){
+        if (typeof iterator === 'function'){
+          if (iterator(value) < iterator(results[i]) || results[i] === undefined){
+            results.splice(i, 0, value);
+            elementAdded = true;
+            break;
+          }
+        } else {
+          if (value[iterator] < results[i][iterator] || results[i] === undefined){
+            results.splice(i, 0, value);
+            elementAdded = true;
+            break;
+          }
+        }
+      }
+      if (!elementAdded){
+        results.push(value);
+      }
+    });
+    return results;
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -368,6 +393,24 @@ var _ = {};
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var results = [];
+    var maxLength = arguments[0].length;
+    for(var i = 1; i < arguments.length; i++){
+      if(arguments[i].length > maxLength){
+        maxLength = arguments[i].length;
+      }
+    }
+
+    for(var i = 0; i < arguments.length; i++){
+      for(var j = 0; j < maxLength; j++){
+        if(results[j] === undefined){
+          results[j] = [];
+        }
+        results[j].push(arguments[i][j]);
+      }
+    }
+
+    return results;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -375,16 +418,61 @@ var _ = {};
   //
   // Hint: Use Array.isArray to check if something is an array
   _.flatten = function(nestedArray, result) {
+    var flattenArray = function(array){
+      var results = [];
+      for(var i = 0; i < array.length; i++){
+        if(Array.isArray(array[i])){
+          var subArray = flattenArray(array[i]);
+          while(subArray.length > 0){
+            results.push(subArray.shift());
+          }
+        } else{
+          results.push(array[i]);
+        }
+      }
+      return results;
+    };
+    return flattenArray(nestedArray);
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    var results = [];
+
+    for(var i = 0; i < arguments[0].length; i++){
+      var foundInEach = true;
+      for(var j = 1; j < arguments.length; j++){
+        if(_.indexOf(arguments[j], arguments[0][i]) < 0){
+          foundInEach = false;
+        }
+      }
+      if(foundInEach){
+        results.push(arguments[0][i]);
+      }
+    }
+
+    return results;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var results = [];
+
+    for(var i = 0; i < arguments[0].length; i++){
+      var foundInAny = false;
+      for (var j = 1; j < arguments.length; j++){
+        if (_.indexOf(arguments[j], arguments[0][i]) >= 0){
+          foundInAny = true;
+        }
+      }
+      if (!foundInAny){
+        results.push(arguments[0][i]);
+      }
+    }
+
+    return results;
   };
 
 
